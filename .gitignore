@@ -88,4 +88,8 @@ htmlcov/
 .env
 .venv/
 venv/
-ENV/ 
+ENV/
+
+# Django migrations
+!**/migrations/
+!**/migrations/*.py 
