@@ -56,7 +56,4 @@ coverage.xml
 .ipynb_checkpoints
 
 # Docker
-.docker/
-
-# Исключение каталога web
-/web/ 
+.docker/ 
