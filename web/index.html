@@ -212,9 +212,22 @@
         <span class="2xl:text-2xl text-xl tracking-widest font-semibold text-black">MENU</span>
     </div>
     <div class="px-6 pt-8 flex flex-col gap-4">
-        <a href="/" rel="external" class="block pt-2 font-[500] text-black uppercase">Главная</a>
-        <a href="/category" rel="external" class="block pt-2 font-[500] text-black uppercase">Продукция</a>
-        <a href="/pos" rel="external" class="block pt-2 font-[500] text-black uppercase">Точки продаж</a>
+        <ul>
+            <li>
+                <a href="/" rel="external" class="block pt-2 font-[500] text-black uppercase">Главная</a>
+            </li>
+            <li>
+                <p class="block pt-2 pb-0 font-[500] text-black uppercase">Продукция</p>
+                <ol class="pl-2 py-2">
+                    <li><a href="/category" rel="external" class=" text-sm font-[500] text-black capitalize">категория 1</a></li>
+                    <li><a href="/category" rel="external" class=" text-sm font-[500] text-black capitalize">категория 2</a></li>
+                    <li><a href="/category" rel="external" class=" text-sm font-[500] text-black capitalize">категория 3</a></li>
+                </ol>
+            </li>
+            <li>
+                <a href="/pos" rel="external" class="block pt-2 font-[500] text-black uppercase">Точки продаж</a>
+            </li>
+        </ul>
     </div>
 </aside>
 <div id="overlay" class="js-sidebar-close fixed inset-0 bg-black/50  backdrop-blur-sm z-40 hidden"></div>

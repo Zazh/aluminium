@@ -17,11 +17,11 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'products',
-    'mptt',  # древовидные категории (django-mptt)
     'rest_framework',
     'django_filters',
     'easy_thumbnails',
     'image_cropping',
+    'contents',
 ]
 
 THUMBNAIL_PROCESSORS = (
@@ -33,15 +33,15 @@ THUMBNAIL_PROCESSORS = (
 )
 THUMBNAIL_DEFAULT_OPTIONS = {
     "format": "WEBP",    # современный лёгкий формат
-    "quality": 80,       # баланс веса и детализации
+    "quality": 90,       # баланс веса и детализации
     # subsampling не задаём → Pillow сам выберет (обычно 4:2:0)
 }
 THUMBNAIL_ALIASES = {
     "": {
         # большая превьюха-квадрат для карточек
-        "default": {"size": (600, 600), "crop": False},
+        "default": {"size": (800, 800), "crop": True},
         # малая превьюха без кропа для списков / lazy-loading
-        "preview": {"size": (320, 320), "crop": True},
+        "preview": {"size": (550, 550), "crop": True},
     }
 }
 THUMBNAIL_EXTENSION = 'webp'
@@ -76,7 +76,7 @@ ROOT_URLCONF = 'core.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        "DIRS": [BASE_DIR / "templates"],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -119,6 +119,10 @@ AUTH_PASSWORD_VALIDATORS = [
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+STATIC_URL = "/static/"
+STATIC_ROOT = BASE_DIR / "staticfiles"
+STATICFILES_DIRS = [BASE_DIR / "static"]  # где лежит tailwind.css
 
 LANGUAGE_CODE = 'en-us'
 

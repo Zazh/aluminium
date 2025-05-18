@@ -22,3 +22,10 @@ def product_image_upload_path(instance, filename):
     unique = uuid.uuid4().hex[:8]
     fname = f"{product_slug}-{unique}.{ext}"
     return os.path.join("product_images", product_slug, fname)
+
+def category_image_upload_path(instance, filename):
+    """ media/category_images/<slug>/uuid.ext """
+    import uuid, os
+    ext = filename.split('.')[-1]
+    name = f"{instance.slug}-{uuid.uuid4().hex[:8]}.{ext}"
+    return os.path.join("category_images", instance.slug, name)

@@ -2,20 +2,26 @@ from django.db import models
 from django.utils.safestring import mark_safe
 from easy_thumbnails.files import get_thumbnailer
 from image_cropping import ImageRatioField
+from django.core.exceptions import ValidationError
 
+from decimal import Decimal, InvalidOperation
 import random
 import string
 
 # noinspection PyUnresolvedReferences
-from core.utils import slug, unique_slug, product_image_upload_path
+from core.utils import slug, unique_slug, product_image_upload_path, category_image_upload_path
 
 # ---- CATEGORY -----------------------------------------------------------
 class ProductCategory(models.Model):
-    title = models.CharField("Название категории", max_length=100)
+    title  = models.CharField("Название категории", max_length=100)
     parent = models.ForeignKey("self", null=True, blank=True,
                                related_name="children", on_delete=models.CASCADE)
+    slug   = models.SlugField(unique=True, blank=True)
 
-    slug = models.SlugField(unique=True, blank=True)
+    # ───── NEW ─────
+    image    = models.ImageField("Изображение", blank=True,
+                                 upload_to=category_image_upload_path)
+    cropping = ImageRatioField("image", "600x600", allow_fullsize=True)
 
     class Meta:
         ordering = ["title"]
@@ -26,6 +32,26 @@ class ProductCategory(models.Model):
         if not self.slug:
             self.slug = unique_slug(self, self.title, model=ProductCategory)
         super().save(*args, **kwargs)
+
+        # после обычного save прогреваем thumbnail-ы
+        if self.image and self.cropping:
+            t = get_thumbnailer(self.image)
+            t['default']   # 600×600, crop = self.cropping
+            t['preview']   # 320×320, crop = False
+
+    # маленькая утилита
+    def thumb(self, alias="preview"):
+        if not self.image:
+            return ""
+        return get_thumbnailer(self.image)[alias].url
+
+    # чтобы видеть превью в админке
+    def thumbnail_preview(self):
+        if self.image:
+            url = self.thumb("preview")
+            return mark_safe(f'<img src="{url}" style="height:80px">')
+        return "—"
+    thumbnail_preview.short_description = "Превью"
 
     def __str__(self):
         return self.title
@@ -55,17 +81,6 @@ class Attribute(models.Model):
     def __str__(self):
         return self.name
 
-class AttributeValue(models.Model):
-    attribute = models.ForeignKey(Attribute, on_delete=models.CASCADE, related_name="values")
-    value = models.CharField("Значение", max_length=255)
-
-    class Meta:
-        unique_together = ("attribute", "value")
-        verbose_name = "Значение атрибута"
-        verbose_name_plural = "Значения атрибутов"
-
-    def __str__(self):
-        return f"{self.attribute.name}: {self.value}"
 
 # ---- PRODUCT ------------------------------------------------------------
 class Product(models.Model):
@@ -73,7 +88,10 @@ class Product(models.Model):
     slug = models.SlugField(unique=True, blank=True)
     category = models.ForeignKey(ProductCategory, related_name="products",
                                  on_delete=models.PROTECT)
+    # description = models.TextField(blank=True)
     description = models.TextField(blank=True)
+
+
     sku = models.CharField(unique=True, blank=True, max_length=100)
     price = models.DecimalField(max_digits=10, decimal_places=2)
 
@@ -161,14 +179,52 @@ class ProductImage(models.Model):
 
 # ---- PRODUCT ↔ ATTRIBUTE VALUE -----------------------------------------
 class ProductAttributeValue(models.Model):
-    product   = models.ForeignKey("Product", on_delete=models.CASCADE, related_name="attribute_values")
-    attribute = models.ForeignKey(Attribute, on_delete=models.PROTECT)
+    product   = models.ForeignKey(
+        "Product", on_delete=models.CASCADE, related_name="attribute_values")
+    attribute = models.ForeignKey("Attribute", on_delete=models.PROTECT)
+
     value     = models.CharField("Значение", max_length=255)
 
     class Meta:
         unique_together = ("product", "attribute")
         verbose_name = "Характеристика товара"
         verbose_name_plural = "Характеристики товара"
+
+    # ───── валидация ─────
+    def clean(self):
+        if not self.attribute:        # нужен при сохранении через shell
+            return
+
+        vt = self.attribute.value_type   # str / int / decimal / bool
+        v  = (self.value or "").strip()
+
+        if vt == "int":
+            if not v.isdigit():
+                raise ValidationError({"value": "Ожидается целое число"})
+            # нормализуем
+            self.value = str(int(v))
+
+        elif vt == "decimal":
+            try:
+                # «3,5» → «3.5», далее проверка
+                d = Decimal(v.replace(",", "."))
+            except (InvalidOperation, ValueError):
+                raise ValidationError({"value": "Ожидается десятичное число"})
+            # нормализуем до строки: '3.50' → '3.5'
+            self.value = str(d.normalize())
+
+        elif vt == "bool":
+            norm = v.lower()
+            if norm in ("да", "yes", "true", "1"):
+                self.value = "Да"
+            elif norm in ("нет", "no", "false", "0"):
+                self.value = "Нет"
+            else:
+                raise ValidationError({"value": "Введите Да / Нет"})
+
+    def save(self, *args, **kwargs):
+        self.full_clean()           # вызывает clean()
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.attribute.name}: {self.value}"

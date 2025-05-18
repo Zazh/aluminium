@@ -1,7 +1,8 @@
 from django.contrib import admin
+from django import forms
 from image_cropping import ImageCroppingMixin
 from .models import (
-    ProductCategory, Product, Attribute, AttributeValue,
+    ProductCategory, Product, Attribute,
     ProductImage, ProductAttributeValue
 )
 
@@ -18,7 +19,7 @@ class ProductAttributeInline(admin.TabularInline):
 
 @admin.register(ProductCategory)
 class ProductCategoryAdmin(admin.ModelAdmin):
-    list_display = ("title", "parent")
+    list_display = ("title", "parent", "thumbnail_preview")
     search_fields = ("title",)
 
 @admin.register(Product)
@@ -32,7 +33,20 @@ class ProductAdmin(admin.ModelAdmin):
 class AttributeAdmin(admin.ModelAdmin):
     search_fields = ("label",)
 
-@admin.register(AttributeValue)
-class AttributeValueAdmin(admin.ModelAdmin):
-    list_select_related = ("attribute",)
-    search_fields = ("value", "attribute__label")
+class ProductAttributeValueForm(forms.ModelForm):
+    class Meta:
+        model  = ProductAttributeValue
+        fields = ("attribute", "value")
+
+    def clean(self):
+        # модель уже валидирует, но хотим показать ошибку до save()
+        self.instance.attribute = self.cleaned_data.get("attribute")
+        self.instance.value     = self.cleaned_data.get("value")
+        self.instance.clean()      # вызовет ValidationError при неверном типе
+        return self.cleaned_data
+
+class ProductAttributeInline(admin.TabularInline):
+    model  = ProductAttributeValue
+    form   = ProductAttributeValueForm
+    extra  = 0
+    autocomplete_fields = ["attribute"]

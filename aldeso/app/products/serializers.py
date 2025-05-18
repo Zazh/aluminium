@@ -1,4 +1,6 @@
 from rest_framework import serializers
+from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
+
 from .models import (
     Product, ProductCategory,
     ProductImage, ProductAttributeValue
@@ -23,12 +25,34 @@ class ProductImageSerializer(serializers.ModelSerializer):
         return self._abs(obj.thumb("preview"))
 
 class ProductAttributeValueSerializer(serializers.ModelSerializer):
-    attribute = serializers.CharField(source="attribute.name")  # ← было attribute_value.attribute.label
-    value     = serializers.CharField()
+    # ← название атрибута одной строкой
+    attribute = serializers.CharField(source="attribute.name", read_only=True)
+    value     = serializers.SerializerMethodField()
 
     class Meta:
         model  = ProductAttributeValue
-        fields = ["attribute", "value"]
+        fields = ("attribute", "value")
+
+    def get_value(self, obj):
+        vt = obj.attribute.value_type
+        v  = (obj.value or "").strip()
+
+        if vt == "int":
+            return int(v) if v.isdigit() else None
+
+        if vt == "decimal":
+            try:
+                d = Decimal(v.replace(",", "."))
+                # убираем экспоненту
+                d = d.quantize(Decimal('1.'), rounding=ROUND_HALF_UP) if d == d.to_integral() else d.normalize()
+                return float(d) if d.as_tuple().exponent else int(d)
+            except (InvalidOperation, ValueError):
+                return v     # оставим как строку, если не парсится
+
+        if vt == "bool":
+            return v.lower() in ("да", "yes", "true", "1")
+
+        return v            # тип str
 
 
 class ProductSerializer(serializers.ModelSerializer):
@@ -42,10 +66,29 @@ class ProductSerializer(serializers.ModelSerializer):
 
     def get_category(self, obj):
         if obj.category:
-            return {"id": obj.category.id, "title": obj.category.title}
+            return {
+                "id": obj.category.id,
+                "title": obj.category.title,
+                "slug": obj.category.slug,
+            }
         return None
 
+# products/serializers.py
 class CategorySerializer(serializers.ModelSerializer):
+    image_default = serializers.SerializerMethodField()
+    image_preview = serializers.SerializerMethodField()
+
     class Meta:
-        model = ProductCategory
-        fields = ["id", "title", "parent_id"]
+        model  = ProductCategory
+        fields = ["id", "title", "slug", "parent_id",
+                  "image_default", "image_preview"]
+
+    def _abs(self, url):
+        req = self.context.get("request")
+        return req.build_absolute_uri(url) if req else url
+
+    def get_image_default(self, obj):
+        return self._abs(obj.thumb("default")) if obj.image else None
+
+    def get_image_preview(self, obj):
+        return self._abs(obj.thumb("preview")) if obj.image else None
