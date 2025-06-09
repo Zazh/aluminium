@@ -24,5 +24,19 @@ services:
     depends_on:
       - db
 
+  decorkz:
+    build:
+      context: ./decorkz
+      dockerfile: Dockerfile
+    env_file:
+      - ./decorkz/.env
+    volumes:
+      - ./decorkz/app:/app
+      - ./decorkz/app/media:/app/media
+    ports:
+      - "8006:8006"
+    depends_on:
+      - db
+
 volumes:
   postgres_data:

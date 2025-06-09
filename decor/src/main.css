@@ -1,0 +1,117 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: 'Gotham Pro';
+  src: url('./fonts/gothampro.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Gotham Pro';
+  src: url('./fonts/gothampro_bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Gotham Pro';
+  src: url('./fonts/gothampro_medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Gotham Pro';
+  src: url('./fonts/gothampro_italic.ttf') format('truetype');
+  font-weight: 400;
+  font-style: italic;
+}
+
+.container-full {
+  @apply grid grid-cols-12 px-4;
+}
+
+#nav {
+  @apply flex justify-between items-center w-full px-4 h-[3.5rem] md:h-[4.5rem] overflow-hidden bg-white fixed border-gray-300 border-b-[1px] z-50;
+}
+
+.select-container {
+  @apply text-sm border-gray-300 border-[1px] rounded-md flex items-center hover:bg-gray-100;
+}
+.select {
+  @apply appearance-none outline-none bg-transparent py-2 px-3 cursor-pointer;
+}
+
+body {
+  background: #ffffff;
+  font-family: 'Gotham Pro', sans-serif;
+}
+
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+#drag-cursor {
+  width: 48px;
+  height: 48px;
+  border-radius: 9999px;
+  background: rgba(50,50,50,0.1);
+  border: 2px solid #888;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  transform: translate(-50%,-50%);
+  transition: background 0.15s, border-color 0.15s;
+  pointer-events: none;
+}
+#drag-cursor.dragging {
+  background: rgba(0,123,255,0.13);
+  border-color: #007bff;
+}
+
+#article-content h1 {
+  @apply font-bold text-4xl md:text-6xl pb-4;
+}
+#article-content h2 {
+  @apply font-bold text-4xl;
+}
+#article-content h3 {
+  @apply font-medium text-2xl;
+}
+#article-content .content > * {
+  @apply py-2;
+}
+#article-content a {
+  @apply text-blue-500 hover:underline;
+}
+#article-content p {
+  @apply text-sm;
+}
+#article-content .hero-img {
+  @apply object-cover object-center w-full pb-4;
+}
+#article-content .hero-img__caption {
+  @apply text-lg pb-6;
+}
+#article-content ul {
+  @apply list-disc list-inside pl-4 text-sm;
+}
+
+.first-img {
+  background: url('../static/img/display2.webp') no-repeat center center;
+  background-size: cover;
+}
+
+.second-img {
+  background: url('../static/img/display.webp') no-repeat center center;
+  background-size: cover;
+}
+
+.third-img {
+  background: url('../static/img/display1.webp') no-repeat center center;
+  background-size: cover;
+}
+
+footer {
+  background: linear-gradient(#1057C6, #056793)!important;
+}
