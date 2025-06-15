@@ -1,138 +1,202 @@
 {% extends "base.html" %}
-{% block title %}{{ seo_title }}{% endblock %}
-{% block description %}{{ seo_description }}{% endblock %}
+{% block title %}{{ og_title }}{% endblock %}
+{% block meta_description %}{{ meta_description }}{% endblock %}
+{% block meta_keywords %}{{ meta_keywords }}{% endblock %}
+{% block og_description %}{{ og_description }}{% endblock %}
+{% block og_image %}{{ og_image }}{% endblock %}
+
 {% block content %}
-
 {% load static %}
-
-<!-- BEGIN navigations -->
-<nav class="navigations container-default">
-    <div class="[ hidden ] col-span-4 xl:flex">
-        <button class="js-sidebar-open ps-[1rem] gap-4 flex items-center">
-            <svg width="48" height="22" viewBox="0 0 48 22" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M0 0H48V3H0V0Z" fill="black"/>
-                <path d="M0 19H48V22H0V19Z" fill="black"/>
+<!-- BEGIN subnav -->
+<section class="md:hidden fixed top-[3.5rem] bg-white border-b-[1px] border-gray-300 flex w-full h-[3rem] justify-between items-center">
+  <div class="w-[4rem] h-full">
+  {% if category_chain|length > 1 %}
+      {% with subcat=category_chain|last %}
+      <a href="{% url 'catalog-by-slug' subcat.slug %}" class="py-2 pl-2 text-black w-full h-full flex items-center" type="button">
+        <svg class="h-8" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" data-slot="icon">
+          <path fill-rule="evenodd" d="M11.78 5.22a.75.75 0 0 1 0 1.06L8.06 10l3.72 3.72a.75.75 0 1 1-1.06 1.06l-4.25-4.25a.75.75 0 0 1 0-1.06l4.25-4.25a.75.75 0 0 1 1.06 0Z" clip-rule="evenodd" />
+        </svg>
+      </a>
+      {% endwith %}
+      {% elif category_chain %}
+            {% with cat=category_chain.0 %}
+          <a href="{% url 'catalog-by-slug' cat.slug %}" class="py-2 pl-2 text-black w-full h-full flex items-center" type="button">
+            <svg class="h-8" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" data-slot="icon">
+              <path fill-rule="evenodd" d="M11.78 5.22a.75.75 0 0 1 0 1.06L8.06 10l3.72 3.72a.75.75 0 1 1-1.06 1.06l-4.25-4.25a.75.75 0 0 1 0-1.06l4.25-4.25a.75.75 0 0 1 1.06 0Z" clip-rule="evenodd" />
             </svg>
-            <span class="2xl:text-2xl text-xl tracking-widest font-semibold text-black">MENU</span>
-        </button>
-    </div>
+          </a>
+            {% endwith %}
+      {% else %}
+        <a href="{% url 'catalog' %}" class="py-2 pl-2 text-black w-full h-full flex items-center" type="button">
+          <svg class="h-8" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" data-slot="icon">
+            <path fill-rule="evenodd" d="M11.78 5.22a.75.75 0 0 1 0 1.06L8.06 10l3.72 3.72a.75.75 0 1 1-1.06 1.06l-4.25-4.25a.75.75 0 0 1 0-1.06l4.25-4.25a.75.75 0 0 1 1.06 0Z" clip-rule="evenodd" />
+          </svg>
+        </a>
+  {% endif %}
+  </div>
+  <div class="flex justify-center items-center">
+    <h1 class="text-md font-medium">{{ product.title }}</h1>
+  </div>
+  <div class="w-[4rem] h-full">
 
-    <div class="xl:col-span-12 md:col-span-16 col-span-full flex items-center justify-between xl:justify-end border-x-[1px] border-gray-300">
-        <button class="js-sidebar-open ps-[1.5rem] gap-4 flex xl:hidden items-center">
-            <svg width="48" height="22" viewBox="0 0 48 22" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M0 0H48V3H0V0Z" fill="black"/>
-                <path d="M0 19H48V22H0V19Z" fill="black"/>
+  </div>
+</section>
+<!-- END subnav -->
+<section class="container-full lg:gap-8 xl:gap-0 pb-[3rem] pt-[7.5rem] md:pt-[5.5rem]">
+  <div class="col-span-full lg:col-span-6 flex items-center justify-center overflow-hidden border-[1px] border-gray-300 aspect-[100/85]">
+    {% if product.images.first %}
+        <img src="{{ product.images.first.image.url }}" alt="{{ product.title }}" loading="lazy" title="{{ product.title }}" class="w-100" >
+    {% endif %}
+  </div>
+  <div class="col-span-full lg:col-span-6 lg:col-start-7 xl:col-start-8 xl:col-span-5">
+    <ul class="hidden col-span-full lg:flex flex-row items-center gap-2 text-sm font-medium">
+      <li>
+        <a href="{% url 'catalog' %}" class="flex items-center gap-2 text-gray-500 hover:text-pink-600">
+          <span>Категории</span>
+          <svg class="size-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" data-slot="icon">
+            <path fill-rule="evenodd" d="M8.22 5.22a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06-1.06L11.94 10 8.22 6.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" />
+          </svg>
+        </a>
+      </li>
+      {% for cat in category_chain %}
+        <li>
+          <a href="{% url 'catalog-by-slug' cat.slug %}" class="flex items-center gap-2 text-gray-500 hover:text-blue-600">
+            <span>{{ cat.title }}</span>
+            <svg class="size-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" data-slot="icon">
+              <path fill-rule="evenodd" d="M8.22 5.22a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06-1.06L11.94 10 8.22 6.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" />
             </svg>
-            <span class="[ hidden md:block ] 2xl:text-2xl text-xl tracking-widest font-semibold text-black">MENU</span>
-        </button>
-
-        <div class="flex items-center justify-between gap-3 w-1/3 sm:w-full">
-            <button data-target=".search-modal" class="js-modal-open [ px-3 py-2.5 me-2 ] inline-flex md:hidden ] [ w-full ] [ gap-2 items-center ] cursor-pointer  focus-within:ring-4 focus-within:outline-hidden text-sm hover:bg-gray-300 text-black [ border-[1px] border-gray-300 ] focus-within:ring-gray-200 rounded-sm">
-                <svg width="15" height="15" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path fill-rule="evenodd" clip-rule="evenodd" d="M10.5236 8.68L14 12.2063L12.25 14L8.68437 10.521C7.78507 11.0806 6.74671 11.3765 5.6875 11.375C2.54625 11.375 0 8.82263 0 5.6875C0 2.54625 2.55238 0 5.6875 0C8.82875 0 11.375 2.55238 11.375 5.6875C11.3766 6.74498 11.0816 7.78172 10.5236 8.68ZM1.74738 5.6455C1.74738 7.8155 3.50962 9.583 5.68488 9.583C7.85488 9.583 9.62237 7.81988 9.62237 5.6455C9.62237 3.4755 7.85925 1.708 5.68488 1.708C3.51488 1.708 1.74738 3.47025 1.74738 5.6455Z" fill="#3947FF"/>
-                </svg>
-                <span class="[ w-[5rem] md:w-auto ] text-left font-bold tracking-wide uppercase">Поиск</span>
-            </button>
-        </div>
+          </a>
+        </li>
+      {% endfor %}
+      <li>
+        <span class="font-[500] text-black">{{ product.title }}</span>
+      </li>
+    </ul>
+    <div class="flex flex-col gap-2 pt-[3rem]">
+      <h1 class="font-bold text-4xl">{{ product.title }}</h1>
+      <h4 class="text-sm font-medium text-gray-500">Артикул: <span>212456</span></h4>
     </div>
+    <ul class="pt-[2rem]">
 
-    <div class="[ hidden md:flex ] col-span-8 xl:col-span-6 items-center justify-start">
-        <button data-target=".search-modal" id="openSearchModal" class="js-modal-open [ mx-2 px-3.5 py-2.5 ] [ w-full ] [ gap-1.5 inline-flex items-center ] cursor-pointer focus-within:ring-4 focus-within:outline-hidden text-sm hover:bg-gray-300 text-black [ border-[1px] border-gray-300 ] focus-within:ring-gray-200 rounded-sm">
-            <svg width="15" height="15" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path fill-rule="evenodd" clip-rule="evenodd" d="M10.5236 8.68L14 12.2063L12.25 14L8.68437 10.521C7.78507 11.0806 6.74671 11.3765 5.6875 11.375C2.54625 11.375 0 8.82263 0 5.6875C0 2.54625 2.55238 0 5.6875 0C8.82875 0 11.375 2.55238 11.375 5.6875C11.3766 6.74498 11.0816 7.78172 10.5236 8.68ZM1.74738 5.6455C1.74738 7.8155 3.50962 9.583 5.68488 9.583C7.85488 9.583 9.62237 7.81988 9.62237 5.6455C9.62237 3.4755 7.85925 1.708 5.68488 1.708C3.51488 1.708 1.74738 3.47025 1.74738 5.6455Z" fill="#3947FF"/>
-            </svg>
-            <span class="font-bold tracking-wide uppercase">Поиск</span>
-        </button>
+      {% if sizes.height or sizes.width or sizes.length %}
+      <li class="flex items-center gap-2 [ border-b-[1px] border-gray-300] ] [ py-3 ]">
+        <span class="w-[60%] inline-block [ font-medium text-gray-500 ]">Размер</span>
+          <span class="w-[40%] inline-block [ font-medium text-black ]">
+            {{ sizes.height|default:"—" }} ×
+            {{ sizes.width|default:"—" }} ×
+            {{ sizes.length|default:"—" }} мм
+          </span>
+      </li>
+      {% endif %}
+
+      <li class="flex items-center gap-2 [ border-b-[1px] border-gray-300] ] [ py-3 ]">
+        <span class="w-[60%] inline-block [ font-medium text-gray-500 ]">Категория</span>
+          <span class="w-[40%] inline-block [ font-medium text-black ]">{{ product.category.title }}</span>
+      </li>
+
+      {% if other_attributes %}
+      {% for attr in other_attributes %}
+      <li class="flex items-center gap-2 [ border-b-[1px] border-gray-300] ] [ py-3 ]">
+        <span class="w-[60%] inline-block [ font-medium text-gray-500 ]">{{ attr.name }}</span>
+        <span class="w-[40%] inline-block [ font-medium text-black ]">{{ attr.value }}</span>
+      </li>
+      {% endfor %}
+      {% endif %}
+
+    </ul>
+    <div class="pt-[3rem]">
+      <h5 class="text-2xl font-bold text-pink-500">
+        <span class="price">{{ product.price|floatformat:0 }}</span> ₸
+      </h5>
     </div>
-</nav>
-<!-- END navigations -->
-
-<div>
-
-<section class="container-default" >
-    <div class="xl:col-start-5 xl:col-span-12 md:col-span-16 col-span-full [ border-x-[1px] border-gray-300 ]">
-        {% if product.images.first %}
-        <img src="{{ product.images.first.image.url }}" alt="{{ product.title }}" loading="lazy" class="w-full aspect-auto" title="{{ product.title }}">
-        {% endif %}
-    </div>
-
+  </div>
 </section>
 
-<section class="container-default [ border-y-[1px] border-gray-300 ]">
-    <div class="xl:col-start-5 xl:col-span-12 md:col-span-16 col-span-full border-x-[1px] border-gray-300 ]">
-        <h1 class="tracking-wide text-4xl font-bold px-6 py-6">{{ product.title }}</h1>
-    </div>
-</section>
-
-<section x-show="item.description && item.description.trim() !== ''" class="container-default [ border-b-[1px] border-gray-300 ]">
-    <div class="xl:col-start-5 xl:col-span-12 md:col-span-16 col-span-full border-x-[1px] border-gray-300 ]">
-        <p class="text-md text-gray-500 px-6 py-6">{{ product.description|safe }}</p>
-    </div>
-</section>
-
-<section class="container-default [ border-b-[1px] border-gray-300 ]">
-    <div class="xl:col-start-5 xl:col-span-12 md:col-span-16 col-span-full border-x-[1px] border-gray-300 ]">
-        <ul class=" flex flex-wrap">
-            <li class="product-list">
-                    <span class="uppercase tracking-wide text-sm font-bold">Цена за п.м</span>
-                    <span class="text-gray-500 text-base">
-                        <span class="price">{{ product.price|floatformat:0 }}</span>
-                        <span>₸</span>
-                    </span>
-            </li>
-            <li class="product-list">
-                    <span class="uppercase tracking-wide text-sm font-bold">Категория</span>
-                    <span class="text-gray-500 text-base">{{ product.category.title }}</span>
-            </li>
-            <li class="product-list">
-                {% if sizes.height or sizes.width or sizes.length %}
-                    <span class=" tracking-wide text-sm ">
-                        <span class="uppercase font-bold">Размер</span>
-                        <span class="font-bold">(ВхШхД)</span>
-                    </span>
-                    <span class="text-gray-500 text-base">
-                        {{ sizes.height|default:"—" }} ×
-                        {{ sizes.width|default:"—" }} ×
-                        {{ sizes.length|default:"—" }} мм
-                    </span>
-                {% endif %}
-            </li>
-
-                {% if other_attributes %}
-                {% for attr in other_attributes %}
-                    <li class="product-list">
-                        <span class="uppercase tracking-wide text-sm font-bold">{{ attr.name }}</span>
-                        <span class="text-gray-500 text-base">{{ attr.value }}</span>
-                    </li>
-                {% endfor %}
-                {% endif %}
-        </ul>
-    </div>
-</section>
-
-<section class="container-default [ border-b-[1px] border-gray-300 ]">
-    <div class="xl:col-start-5 xl:col-span-12 md:col-span-16 col-span-full border-x-[1px] border-gray-300 ]">
-        <h1 class="tracking-wide text-3xl font-bold px-6 pt-12 pb-6">
-            Похожие товары
-        </h1>
-    </div>
-</section>
-
-<section class="container-default" x-data="product" x-show="related.length" x-cloak>
+<div class="px-4  border-t-[1px] border-gray-300">
+  <section id="home-hero" class="flex w-full h-[100vh] min-h-[35rem] max-h-[45rem] p-4 pb-[4rem] gap-4 [ overflow-x-auto scroll-smooth snap-x snap-mandatory no-scrollbar ]" x-data="product" x-show="related.length" x-cloak>
     <template x-for="(p, i) in related" :key="p.id">
-        <article class="col-span-12 md:col-span-8 xl:col-span-4 border-gray-300 border-r-[1px]"
-                 :class="i === 0 ? 'xl:col-start-5 border-x-[1px]' : ''">
-            <a :href="`/product/${p.slug}/`" class="block">
-                <div class="product-mini-image-container">
-                    <img :src="p.images[0].preview_url" loading="lazy" class="product-mini-image" :alt="p.title" :title="p.title">
-                </div>
-                <div class="p-sm border-y-[1px] border-gray-300 relative md:h-[4.5rem] h-[6rem]">
-                    <h2 class="py-6 px-4 md:py-3 text-sm font-bold uppercase" x-text="p.title"></h2>
-                </div>
-            </a>
-        </article>
+      <article class="flex-shrink-0 snap-start w-full md:w-1/3 lg:w-1/4 h-full relative overflow-hidden transition-all duration-300 md:block">
+      <a class="cursor-none" :href="`/product/${p.slug}/`">
+        <figure>
+          <img :src="p.images[0].preview_url" loading="lazy" :alt="p.title" :title="p.title">
+          <figcaption class="py-3 flex gap-1 flex-col">
+            <div class="flex items-center justify-between">
+              <h2 class="[ flex flex-col gap-1 ]">
+                <span class="text-sm uppercase font-bold" x-text="p.title"></span>
+              </h2>
+              <p class="font-medium text-sm text-gray-500"></p>
+            </div>
+            <p class="text-sm text-gray-500 font-medium flex gap-2 ]">
+              <span x-text="formatPrice(p.price)"></span>
+            </p>
+          </figcaption>
+        </figure>
+      </a>
+      </article>
     </template>
-</section>
+    <div id="drag-cursor" class="pointer-events-none fixed z-50 hidden"></div>
+  </section>
 </div>
+
+<!-- BEGIN drag and scroll -->
+<script>
+    const slider = document.getElementById('home-hero');
+    const cursor = document.getElementById('drag-cursor');
+
+    let isDragging = false;
+    let startX, scrollLeft;
+    let dragStarted = false;
+
+    // Начало drag (добавлен preventDefault)
+    slider.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        dragStarted = false;
+        startX = e.pageX;
+        scrollLeft = slider.scrollLeft;
+        slider.classList.add('select-none');
+        cursor.classList.add('dragging');
+        e.preventDefault(); // предотвращает захват ссылок браузером!
+    });
+
+    // Drag-логика
+    slider.addEventListener('mousemove', (e) => {
+        cursor.style.left = e.clientX + 'px';
+        cursor.style.top = e.clientY + 'px';
+
+        if (!isDragging) return;
+        const x = e.pageX;
+        const walk = (x - startX) * 1.5; // скорость скролла
+        if (Math.abs(x - startX) > 5) dragStarted = true;
+        slider.scrollLeft = scrollLeft - walk;
+    });
+
+    // Конец drag
+    window.addEventListener('mouseup', () => {
+        isDragging = false;
+        slider.classList.remove('select-none');
+        cursor.classList.remove('dragging');
+    });
+
+    // Отмена клика по ссылке, если был drag
+    slider.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', (e) => {
+            if (dragStarted) {
+                e.preventDefault();
+            }
+        });
+    });
+
+    // Показать кастомный курсор
+    slider.addEventListener('mouseenter', () => {
+        cursor.classList.remove('hidden');
+        slider.style.cursor = 'none';
+    });
+    slider.addEventListener('mouseleave', () => {
+        cursor.classList.add('hidden');
+        slider.style.cursor = '';
+    });
+
+</script>
+<!-- END drag and scroll -->
 
 {% endblock %}

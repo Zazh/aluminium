@@ -2,14 +2,18 @@
 from rest_framework import filters, viewsets
 from django.shortcuts import render, get_object_or_404
 from django.db.models import Q, OuterRef
+import django_filters as df
+
 
 from .filters import ProductFilter
 from .filters_config import FILTER_CONFIG
 
+from django.core.paginator import Paginator
+
 from .services import StandardResultsSetPagination
 from .models import Product, ProductCategory, ProductAttributeValue, Attribute
 from .serializers import ProductSerializer, CategorySerializer
-from django_filters.rest_framework import DjangoFilterBackend
+from django_filters.rest_framework import DjangoFilterBackend, BooleanFilter
 
 class ProductViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = (
@@ -43,10 +47,18 @@ class ProductViewSet(viewsets.ReadOnlyModelViewSet):
     pagination_class = StandardResultsSetPagination
 
 
+class CategoryFilter(df.FilterSet):
+    parent__isnull = BooleanFilter(field_name='parent', lookup_expr='isnull')
+
+    class Meta:
+        model = ProductCategory
+        fields = ['parent', 'parent__isnull']
 
 class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = ProductCategory.objects.all()
     serializer_class = CategorySerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = CategoryFilter
 
 # --- Получаем slug-и атрибутов ---
 def get_attr_slug(attr_name):
@@ -101,37 +113,69 @@ def format_number(value):
     except (ValueError, TypeError):
         return str(value)
 
+def catalog_root(request):
+    categories = ProductCategory.objects.filter(parent=None).order_by('title')
+    return render(request, "catalog_root.html", {
+        "categories": categories,
+        "og_title": "Каталог товаров — Decorkz.kz",
+        "meta_description": "Каталог товаров: молдинги, плинтусы, рейки, декоративные элементы для интерьера. Прямые поставки. Лучшие цены в Казахстане.",
+        "meta_keywords": "каталог, декор, молдинги, плинтусы, рейки, интерьер, Казахстан",
+        "og_description": "Весь ассортимент молдингов и декоративных элементов для интерьера. Каталог товаров Decorkz.kz.",
+        "og_image": request.build_absolute_uri("/static/static/img/catalog-og.jpg"),
+    })
+
+
 def catalog(request, category_slug=None):
     category = None
     categories = list(ProductCategory.objects.values("id", "title", "slug").order_by("title"))
-    seo_title = "Каталог товаров aldeso.kz"
-    seo_description = "Aluminium decorative solution - производим алюминиевые декоративные решения, карнизы, плинтусы, рейки"
+    seo_title = "Каталог товаров decorkz.kz"
+    seo_description = "decor.kz - производим декоративные решения, карнизы, плинтусы, рейки"
     allowed_orderings = ["title", "-title", "price", "-price"]
     filter_config = FILTER_CONFIG.get(category_slug, FILTER_CONFIG['default'])
 
     products = []
-    col1, col2, col3 = [], [], []
     attribute_values = {}
     vid_values = []
+    page_obj = None
 
-    # Инициализация списков фильтров заранее
     price_values = request.GET.getlist('price') if category_slug else []
     length_values = request.GET.getlist('length') if category_slug else []
     width_values = request.GET.getlist('width') if category_slug else []
     height_values = request.GET.getlist('height') if category_slug else []
     vid_selected = request.GET.getlist('vid') if category_slug else []
-    podsvetka_selected = request.GET.getlist('podsvetka') if category_slug else []
 
     if category_slug:
-        category = ProductCategory.objects.filter(slug=category_slug).first()
-        if not category:
-            category = None
+        category = get_object_or_404(ProductCategory, slug=category_slug)
+        # 1. Сначала ищем подкатегории
+        subcategories = ProductCategory.objects.filter(parent=category)
 
-        products_qs = Product.objects.filter(category=category).prefetch_related(
+        if category.image and category.thumb("preview"):
+            og_image = request.build_absolute_uri(category.thumb("preview"))
+        else:
+            og_image = request.build_absolute_uri("/static/static/img/catalog-og.jpg")
+
+        if subcategories.exists():
+            # Если есть подкатегории — показываем их (без товаров)
+            return render(request, "catalog_category.html", {
+                "category": category,
+                "subcategories": subcategories,
+                "seo_title": f"{category.title} — Категория",
+                "seo_description": f"Список подкатегорий {category.title}",
+                "meta_description": f"Список подкатегорий {category.title}",
+                "meta_keywords": f"{category.title}, каталог, подкатегории, декор, молдинги",
+                "og_image": og_image,
+                "og_title": f"{category.title} — Категория",
+                "og_description": f"Список подкатегорий {category.title}",
+            })
+
+        # 2. Если подкатегорий нет — показываем товары
+        children_ids = list(category.children.values_list('id', flat=True))
+        category_ids = [category.id] + children_ids
+
+        products_qs = Product.objects.filter(category__id__in=category_ids).prefetch_related(
             'images', 'attribute_values__attribute'
         )
 
-        # --- Получаем уникальные значения атрибутов для фильтров по категории ---
         for attr_name in filter_config.get('attributes', []):
             values = ProductAttributeValue.objects.filter(
                 attribute__name__iexact=attr_name,
@@ -139,42 +183,26 @@ def catalog(request, category_slug=None):
             ).values_list('value', flat=True).distinct()
             attribute_values[attr_name] = list(values)
 
-        # --- Получаем слаги атрибутов ---
-        def get_attr_slug(attr_name):
-            try:
-                return Attribute.objects.only("slug").get(name__iexact=attr_name).slug
-            except Attribute.DoesNotExist:
-                return None
-
         length_slug = get_attr_slug('длина')
         width_slug = get_attr_slug('ширина')
         height_slug = get_attr_slug('высота')
 
-        # --- Применяем фильтры ---
         products_qs = apply_range_filters(products_qs, 'price', price_values)
         products_qs = apply_range_filters(products_qs, 'length', length_values, length_slug)
         products_qs = apply_range_filters(products_qs, 'width', width_values, width_slug)
         products_qs = apply_range_filters(products_qs, 'height', height_values, height_slug)
-        # --- Фильтр по "Вид" ---
+
         if 'вид' in filter_config.get('attributes', []) and vid_selected:
             products_qs = products_qs.filter(
                 attribute_values__attribute__name__iexact='вид',
                 attribute_values__value__in=vid_selected
             ).distinct()
 
-        if 'подсветка' in filter_config.get('attributes', []) and podsvetka_selected:
-            products_qs = products_qs.filter(
-                attribute_values__attribute__name__iexact='подсветка',
-                attribute_values__value__in=podsvetka_selected
-            ).distinct()
-
-        # --- Сортировка ---
         ordering = request.GET.get("ordering")
         if ordering in allowed_orderings:
             products_qs = products_qs.order_by(ordering)
         else:
             products_qs = products_qs.order_by('id')
-
 
         products = [
             {
@@ -185,6 +213,7 @@ def catalog(request, category_slug=None):
                 "image": p.images.first().thumb("preview") if p.images.exists() else "",
                 "alt": f"{p.category.title} {p.title}",
                 "title_attr": f"{p.category.title} {p.title}",
+                "category_title": p.category.title,
                 "size": " × ".join([
                     format_number(next((a.value for a in p.attribute_values.all() if a.attribute.name.lower() == 'высота'), '')),
                     format_number(next((a.value for a in p.attribute_values.all() if a.attribute.name.lower() == 'ширина'), '')),
@@ -195,23 +224,24 @@ def catalog(request, category_slug=None):
             for p in products_qs
         ]
 
-        col1, col2, col3 = products[::3], products[1::3], products[2::3]
-
         seo_title = f"{category.title} — Купить по лучшей цене"
         seo_description = f"{category.title}: широкий ассортимент по доступным ценам."
 
-        # Для шаблона, чтобы проще было сравнивать выбранные значения
         vid_values = attribute_values.get('вид', [])
+
+        paginator = Paginator(products, 20)
+        page_obj = paginator.get_page(request.GET.get('page', 1))
 
     context = {
         "categories": categories,
         "products": products,
-        "col1": col1,
-        "col2": col2,
-        "col3": col3,
         "current_category": category,
         "seo_title": seo_title,
         "seo_description": seo_description,
+        "meta_description": seo_description,
+        "meta_keywords": "каталог, декор, молдинги, купить, Казахстан",  # можно добавить или брать из категории
+        "og_title": seo_title,
+        "og_description": seo_description,
         "attribute_values": attribute_values,
         "filter_config": filter_config,
         "length_values": length_values,
@@ -220,10 +250,12 @@ def catalog(request, category_slug=None):
         "price_values": price_values,
         "vid_selected": vid_selected,
         "vid_values": vid_values,
-        "podsvetka_selected": podsvetka_selected,
+        "page_obj": page_obj,
         "podsvetka_values": attribute_values.get('подсветка', []),
     }
     return render(request, "catalog.html", context)
+
+
 
 def product_detail(request, slug):
     product = get_object_or_404(Product, slug=slug)
@@ -252,13 +284,35 @@ def product_detail(request, slug):
     seo_title = f"{product.title} — купить по лучшей цене"
     seo_description = (product.description or f"Купить {product.title} по доступной цене. Характеристики, фото, доставка.")
 
+    def get_category_chain(category):
+        chain = []
+        while category:
+            chain.append(category)
+            category = category.parent
+        return list(reversed(chain))
+
+    category_chain = get_category_chain(product.category)
+
+    if product.images.exists():
+        main_image = product.images.filter(is_main=True).first() or product.images.first()
+        og_image = request.build_absolute_uri(main_image.thumb("preview"))
+    else:
+        og_image = "/static/static/img/catalog-og.jpg"  # дефолтная картинка если фото нет
+
+
     context = {
         "product": product,
         "seo_title": seo_title,
         "seo_description": seo_description,
+        "meta_description": seo_description,
+        "meta_keywords": "каталог, декор, молдинги, купить, Казахстан",  # можно добавить или брать из категории
+        "og_title": seo_title,
+        "og_description": seo_description,
+        "og_image": og_image,  # ← вот оно!
         "sizes": sizes,
         "vid": vid,
         "podsvetka": podsvetka,
         "other_attributes": other_attributes,
+        "category_chain": category_chain,  # цепочка категорий для хлебных крошек
     }
     return render(request, "product.html", context)

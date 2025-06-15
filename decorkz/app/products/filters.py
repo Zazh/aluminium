@@ -22,11 +22,12 @@ def _slug(attr_name: str) -> str | None:
         return None
 
 
-ATTR_SLUGS = {
-    "length":  _slug("длина"),
-    "width":   _slug("ширина"),
-    "height":  _slug("высота"),
-}
+def get_attr_slug(dim: str) -> str | None:
+    return _slug({
+        "length": "длина",
+        "width": "ширина",
+        "height": "высота",
+    }[dim])
 # ────────────────────────────────────────────────────────────────
 
 
@@ -69,24 +70,16 @@ class ProductFilter(df.FilterSet):
 
     # ======== универсальные методы ========
     def min_filter(self, qs, name, value):
-        """
-        name = '<dim>_min',  value = 123
-        """
-        dim = name.removesuffix("_min")        # length / width / height
-        slug = ATTR_SLUGS[dim]
+        dim = name.removesuffix("_min")  # length / width / height
+        slug = get_attr_slug(dim)
         alias = f"{dim}_num"
-
         qs = self._annotate_dim(qs, alias, slug)
         return qs.filter(**{f"{alias}__gte": value})
 
     def max_filter(self, qs, name, value):
-        """
-        name = '<dim>_max',  value = 456
-        """
         dim = name.removesuffix("_max")
-        slug = ATTR_SLUGS[dim]
+        slug = get_attr_slug(dim)
         alias = f"{dim}_num"
-
         qs = self._annotate_dim(qs, alias, slug)
         return qs.filter(**{f"{alias}__lte": value})
 
