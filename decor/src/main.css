@@ -97,18 +97,8 @@ body {
   @apply list-disc list-inside pl-4 text-sm;
 }
 
-.first-img {
-  background: url('../static/img/display2.webp') no-repeat center center;
-  background-size: cover;
-}
-
-.second-img {
-  background: url('../static/img/display.webp') no-repeat center center;
-  background-size: cover;
-}
-
-.third-img {
-  background: url('../static/img/display1.webp') no-repeat center center;
+.slider-bg {
+  background: #fcfcfc;
   background-size: cover;
 }
 

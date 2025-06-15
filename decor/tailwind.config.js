@@ -5,6 +5,7 @@ export default {
     "./catalog.html",
     "./product.html",
     "./categorys.html",
+    "./subcategorys.html",
     "./article.html",
     "./articles-list.html",
     "./contacts.html",

@@ -1,12 +1,12 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="ru">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport"
         content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <link rel="stylesheet" href="dist/styles.css">
-  <title>Product</title>
+  <title>sub</title>
 </head>
 <body>
 <nav id="nav">
@@ -157,180 +157,101 @@
     </button>
   </div>
 </nav>
-<!-- BEGIN subnav -->
-<section class="md:hidden fixed top-[3.5rem] bg-white border-b-[1px] border-gray-300 flex w-full h-[3rem] justify-between items-center">
-  <div class="w-[4rem] h-full">
-    <a href="{% url 'catalog-by-slug' current_category.parent.slug %}" class="py-2 pl-2 text-black w-full h-full flex items-center" type="button">
-      <svg class="h-8" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" data-slot="icon">
-        <path fill-rule="evenodd" d="M11.78 5.22a.75.75 0 0 1 0 1.06L8.06 10l3.72 3.72a.75.75 0 1 1-1.06 1.06l-4.25-4.25a.75.75 0 0 1 0-1.06l4.25-4.25a.75.75 0 0 1 1.06 0Z" clip-rule="evenodd" />
-      </svg>
-    </a>
-  </div>
-  <div class="flex justify-center items-center">
-    <h1 class="text-md font-medium">{{ current_category }}</h1>
-  </div>
-  <div class="w-[4rem] h-full">
-    <button data-target="#filter-modal" class="js-open w-full h-full pr-4 flex justify-end items-center">
-      <svg class="h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <g id="style=fill">
-          <g id="filter-circle">
-            <path id="vector (Stroke)" fill-rule="evenodd" clip-rule="evenodd" d="M7.75 17.5C7.75 17.0858 7.41421 16.75 7 16.75H2C1.58579 16.75 1.25 17.0858 1.25 17.5C1.25 17.9142 1.58579 18.25 2 18.25H7C7.41421 18.25 7.75 17.9142 7.75 17.5Z" fill="#000000"/>
-            <path id="vector (Stroke)_2" fill-rule="evenodd" clip-rule="evenodd" d="M16.25 6.5C16.25 6.08579 16.5858 5.75 17 5.75H22C22.4142 5.75 22.75 6.08579 22.75 6.5C22.75 6.91421 22.4142 7.25 22 7.25H17C16.5858 7.25 16.25 6.91421 16.25 6.5Z" fill="#000000"/>
-            <path id="vector (Stroke)_3" fill-rule="evenodd" clip-rule="evenodd" d="M22.75 17.5C22.75 17.0858 22.4142 16.75 22 16.75H13C12.5858 16.75 12.25 17.0858 12.25 17.5C12.25 17.9142 12.5858 18.25 13 18.25H22C22.4142 18.25 22.75 17.9142 22.75 17.5Z" fill="#000000"/>
-            <path id="vector (Stroke)_4" fill-rule="evenodd" clip-rule="evenodd" d="M1.25 6.5C1.25 6.08579 1.58579 5.75 2 5.75H11C11.4142 5.75 11.75 6.08579 11.75 6.5C11.75 6.91421 11.4142 7.25 11 7.25H2C1.58579 7.25 1.25 6.91421 1.25 6.5Z" fill="#000000"/>
-            <path id="vector (Stroke)_5" fill-rule="evenodd" clip-rule="evenodd" d="M13.75 17.3999C13.75 15.3288 12.0711 13.6499 10 13.6499C7.92893 13.6499 6.25 15.3288 6.25 17.3999C6.25 19.471 7.92893 21.1499 10 21.1499C12.0711 21.1499 13.75 19.471 13.75 17.3999Z" fill="#000000"/>
-            <path id="vector (Stroke)_6" fill-rule="evenodd" clip-rule="evenodd" d="M10.25 6.3999C10.25 4.32883 11.9289 2.6499 14 2.6499C16.0711 2.6499 17.75 4.32883 17.75 6.3999C17.75 8.47097 16.0711 10.1499 14 10.1499C11.9289 10.1499 10.25 8.47097 10.25 6.3999Z" fill="#000000"/>
-          </g>
-        </g>
-      </svg>
-    </button>
-  </div>
-</section>
-<!-- END subnav -->
-<section class="container-full lg:gap-8 xl:gap-0 pb-[3rem] pt-[7.5rem] md:pt-[5.5rem]">
-  <div class="col-span-full lg:col-span-6 flex items-center justify-center overflow-hidden border-[1px] border-gray-300 aspect-[100/85]">
-    <img src="static/img/prod.jpg" class="w-100" alt="">
-  </div>
-  <div class="col-span-full lg:col-span-6 lg:col-start-7 xl:col-start-8 xl:col-span-5">
-    <ul class="hidden col-span-full lg:flex flex-row items-center gap-2 text-sm font-medium ">
-      <li>
-        <a href="" class="flex items-center gap-2 text-gray-500 hover:text-pink-600">
-          <span>Категории</span>
-          <svg class="size-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" data-slot="icon">
-            <path fill-rule="evenodd" d="M8.22 5.22a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06-1.06L11.94 10 8.22 6.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" />
-          </svg>
-        </a>
-      </li>
-      <li>
-        <a href="" class="flex items-center gap-2 text-gray-500 hover:text-blue-600">
-          <span>Карнизы</span>
-          <svg class="size-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" data-slot="icon">
-            <path fill-rule="evenodd" d="M8.22 5.22a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06-1.06L11.94 10 8.22 6.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" />
-          </svg>
-        </a>
-      </li>
-      <li>
-        <span class="font-[500] text-black">DD521</span>
-      </li>
-    </ul>
-    <div class="flex flex-col gap-2 pt-[3rem]">
-      <h1 class="font-bold text-4xl">DD521</h1>
-      <h4 class="text-sm font-medium text-gray-500">Артикул: <span>212456</span></h4>
-    </div>
-    <ul class="pt-[2rem]">
-      <li class="flex items-center gap-2 [ border-b-[1px] border-gray-300] ] [ py-3 ]">
-        <span class="w-[60%] inline-block [ font-medium text-gray-500 ]">Размер</span>
-        <span class="w-[40%] inline-block [ font-medium text-black ]">20х12х2500</span>
-      </li>
-      <li class="flex items-center gap-2 [ border-b-[1px] border-gray-300] ] [ py-3 ]">
-        <span class="w-[60%] inline-block [ font-medium text-gray-500 ]">Материал</span>
-        <span class="w-[40%] inline-block [ font-medium text-black ]">Дюрополимер</span>
-      </li>
-      <li class="flex items-center gap-2 [ border-b-[1px] border-gray-300] ] [ py-3 ]">
-        <span class="w-[60%] inline-block [ font-medium text-gray-500 ]">Вложение в коробке</span>
-        <span class="w-[40%] inline-block [ font-medium text-black ]">20 шт.</span>
-      </li>
-    </ul>
-    <div class="pt-[3rem]">
-      <h5 class="text-2xl font-bold text-pink-500"><span>14 100</span> ₸</h5>
-    </div>
-  </div>
-</section>
 
-<section class="grid grid-cols-10 p-4 pb-[4rem] gap-4 border-t-[1px] border-gray-300">
-  <article class="md:col-span-4 lg:col-span-2 col-span-full">
+<section class="grid grid-cols-12 pb-[2rem] px-4 gap-4">
+  <div class="border-b-[1px] border-gray-300 col-span-full pt-[12rem]">
+    <h1 class="text-4xl md:text-6xl font-medium pb-[3rem]">Лепной декор</h1>
+  </div>
+  <article class="col-span-5 md:col-span-2">
     <a href="">
       <figure>
         <img src="static/img/prod.jpg" alt="">
         <figcaption class="py-3 flex gap-1 flex-col">
           <div class="flex items-center justify-between">
             <h2 class="[ flex flex-col gap-1 ]">
-              <span class="text-sm uppercase font-bold">Q80/120</span>
+              <span class="text-sm uppercase font-bold">Лепной декор</span>
             </h2>
-            <p class="font-medium text-sm text-gray-500">10 000 ₸</p>
           </div>
-          <p class="text-sm text-gray-500 font-medium flex gap-2 ]">
-            <span>Категория </span>
-          </p>
         </figcaption>
       </figure>
     </a>
   </article>
-  <article class="md:col-span-4 lg:col-span-2 col-span-full">
+
+  <article class="col-span-5 md:col-span-2">
     <a href="">
       <figure>
-        <img src="static/img/prod.jpg" alt="">
+        <img src="static/img/panel.jpg" alt="">
         <figcaption class="py-3 flex gap-1 flex-col">
           <div class="flex items-center justify-between">
             <h2 class="[ flex flex-col gap-1 ]">
-              <span class="text-sm uppercase font-bold">Q80/120</span>
+              <span class="text-sm uppercase font-bold">панели</span>
             </h2>
-            <p class="font-medium text-md text-gray-500">10 000 ₸</p>
           </div>
-          <p class="text-sm text-gray-500 font-medium flex gap-2 ]">
-            <span>Категория </span>
-          </p>
         </figcaption>
       </figure>
     </a>
   </article>
-  <article class="md:col-span-4 lg:col-span-2 col-span-full">
+
+  <article class="col-span-5 md:col-span-2">
     <a href="">
       <figure>
-        <img src="static/img/prod.jpg" alt="">
+        <img src="static/img/plintus.jpg" alt="">
         <figcaption class="py-3 flex gap-1 flex-col">
           <div class="flex items-center justify-between">
             <h2 class="[ flex flex-col gap-1 ]">
-              <span class="text-sm uppercase font-bold">Q80/120</span>
+              <span class="text-sm uppercase font-bold">Плинтусы</span>
             </h2>
-            <p class="font-medium text-sm text-gray-500">10 000 ₸</p>
           </div>
-          <p class="text-sm text-gray-500 font-medium flex gap-2 ]">
-            <span>10х200х3000 мм</span>
-            <span>(ШхВхД)</span>
-          </p>
         </figcaption>
       </figure>
     </a>
   </article>
-  <article class="md:col-span-4 lg:col-span-2 col-span-full">
+
+  <article class="col-span-5 md:col-span-2">
     <a href="">
       <figure>
-        <img src="static/img/prod.jpg" alt="">
+        <img src="static/img/decoplume.jpg" alt="">
         <figcaption class="py-3 flex gap-1 flex-col">
           <div class="flex items-center justify-between">
             <h2 class="[ flex flex-col gap-1 ]">
-              <span class="text-sm uppercase font-bold">Q80/120</span>
+              <span class="text-sm uppercase font-bold">Декоративные элементы</span>
             </h2>
-            <p class="font-medium text-sm text-gray-500">10 000 ₸</p>
           </div>
-          <p class="text-sm text-gray-500 font-medium flex gap-2 ]">
-            <span>10х200х3000 мм</span>
-            <span>(ШхВхД)</span>
-          </p>
         </figcaption>
       </figure>
     </a>
   </article>
-  <article class="md:col-span-4 lg:col-span-2 col-span-full">
+
+  <article class="col-span-5 md:col-span-2">
     <a href="">
       <figure>
-        <img src="static/img/prod.jpg" alt="">
+        <img src="static/img/smesitel.jpg" alt="">
         <figcaption class="py-3 flex gap-1 flex-col">
           <div class="flex items-center justify-between">
             <h2 class="[ flex flex-col gap-1 ]">
-              <span class="text-sm uppercase font-bold">Q80/120</span>
+              <span class="text-sm uppercase font-bold">Смесители</span>
             </h2>
-            <p class="font-medium text-sm text-gray-500">10 000 ₸</p>
           </div>
-          <p class="text-sm text-gray-500 font-medium flex gap-2 ]">
-            <span>10х200х3000 мм</span>
-            <span>(ШхВхД)</span>
-          </p>
         </figcaption>
       </figure>
     </a>
   </article>
+
+  <article class="col-span-5 md:col-span-2">
+    <a href="">
+      <figure>
+        <img src="static/img/paints.jpg" alt="">
+        <figcaption class="py-3 flex gap-1 flex-col">
+          <div class="flex items-center justify-between">
+            <h2 class="[ flex flex-col gap-1 ]">
+              <span class="text-sm uppercase font-bold">Отделочные материалы</span>
+            </h2>
+          </div>
+        </figcaption>
+      </figure>
+    </a>
+  </article>
+
 </section>
 
 <footer class="container-full py-[3rem] gap-8">
@@ -368,19 +289,19 @@
   </div>
   <div class="col-span-full md:col-span-6 xl:col-span-3 xl:col-start-10">
     <div class="flex flex-col">
-        <div class="flex gap-2 items-center md:ms-auto">
-          <svg class="size-6" xmlns="http://www.w3.org/2000/svg" width="23.738" height="23.684" viewBox="0 0 23.738 23.684">
-            <g id="call-answer" transform="translate(0 -0.394)">
-              <g id="Group_38" data-name="Group 38" transform="translate(0 0.394)">
-                <g id="Group_37" data-name="Group 37" transform="translate(0 0)">
-                  <path id="Path_23" data-name="Path 23" d="M23.205,19.126,19.539,15.46a1.911,1.911,0,0,0-2.695.051L15,17.357l-.364-.2a18.379,18.379,0,0,1-4.442-3.213,18.482,18.482,0,0,1-3.219-4.45c-.068-.124-.134-.243-.2-.356L8.012,7.9l.609-.61a1.91,1.91,0,0,0,.049-2.7L5,.926A1.909,1.909,0,0,0,2.31.976L1.276,2.015l.028.028a5.975,5.975,0,0,0-.851,1.5A6.226,6.226,0,0,0,.075,5.068C-.41,9.081,1.424,12.749,6.4,17.726c6.879,6.879,12.423,6.359,12.662,6.334a6.194,6.194,0,0,0,1.527-.384,5.954,5.954,0,0,0,1.5-.848l.023.02,1.047-1.025A1.913,1.913,0,0,0,23.205,19.126Z" transform="translate(0 -0.394)" fill="#fff"/>
-                </g>
+      <div class="flex gap-2 items-center md:ms-auto">
+        <svg class="size-6" xmlns="http://www.w3.org/2000/svg" width="23.738" height="23.684" viewBox="0 0 23.738 23.684">
+          <g id="call-answer" transform="translate(0 -0.394)">
+            <g id="Group_38" data-name="Group 38" transform="translate(0 0.394)">
+              <g id="Group_37" data-name="Group 37" transform="translate(0 0)">
+                <path id="Path_23" data-name="Path 23" d="M23.205,19.126,19.539,15.46a1.911,1.911,0,0,0-2.695.051L15,17.357l-.364-.2a18.379,18.379,0,0,1-4.442-3.213,18.482,18.482,0,0,1-3.219-4.45c-.068-.124-.134-.243-.2-.356L8.012,7.9l.609-.61a1.91,1.91,0,0,0,.049-2.7L5,.926A1.909,1.909,0,0,0,2.31.976L1.276,2.015l.028.028a5.975,5.975,0,0,0-.851,1.5A6.226,6.226,0,0,0,.075,5.068C-.41,9.081,1.424,12.749,6.4,17.726c6.879,6.879,12.423,6.359,12.662,6.334a6.194,6.194,0,0,0,1.527-.384,5.954,5.954,0,0,0,1.5-.848l.023.02,1.047-1.025A1.913,1.913,0,0,0,23.205,19.126Z" transform="translate(0 -0.394)" fill="#fff"/>
               </g>
             </g>
-          </svg>
-          <a href="" class="text-white font-medium text-2xl leading-0">+7 771 402 8897</a>
-        </div>
-        <p class="text-gray-200 md:text-right">Служба поддержки</p>
+          </g>
+        </svg>
+        <a href="" class="text-white font-medium text-2xl leading-0">+7 771 402 8897</a>
+      </div>
+      <p class="text-gray-200 md:text-right">Служба поддержки</p>
     </div>
   </div>
 </footer>
