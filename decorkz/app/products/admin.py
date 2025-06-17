@@ -19,7 +19,7 @@ class ProductAttributeInline(admin.TabularInline):
 
 @admin.register(ProductCategory)
 class ProductCategoryAdmin(admin.ModelAdmin):
-    list_display = ("title", "parent", "thumbnail_preview")
+    list_display = ("title", "slug", "parent", "thumbnail_preview")
     search_fields = ("title",)
 
 @admin.register(Product)

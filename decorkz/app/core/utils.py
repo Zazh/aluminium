@@ -1,18 +1,21 @@
 import os
+import random
+import string
 import uuid
 from slugify import slugify as _slugify
 
 # ────────── единый slugify ──────────
-def slug(text: str, *, max_len: int = 255) -> str:
-    return _slugify(text, lowercase=True, max_length=max_len, separator='-') or "item"
+def slug(text: str, max_len: int = 50) -> str:
+    # если text пустой — делаем dummy-значение
+    base = _slugify(text, lowercase=True, max_length=max_len, separator='-') or "item"
+    return base
 
-def unique_slug(instance, text, *, model, field_name="slug", max_len=255):
-    base = slug(text, max_len=max_len)
+def unique_slug(instance, text, model, field_name="slug", max_len=50, suffix_len=4):
+    base = slug(text, max_len=max_len-suffix_len-1)
     candidate = base
-    counter = 1
     while model.objects.exclude(pk=getattr(instance, "pk", None)).filter(**{field_name: candidate}).exists():
-        counter += 1
-        candidate = f"{base}-{counter}"
+        rand_suffix = ''.join(random.choices(string.digits, k=suffix_len))
+        candidate = f"{base}-{rand_suffix}"
     return candidate
 
 # ─────────── upload path ────────────
