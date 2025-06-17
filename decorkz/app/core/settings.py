@@ -36,6 +36,7 @@ INSTALLED_APPS = [
 ]
 
 THUMBNAIL_PROCESSORS = (
+    'products.thumbnail_processors.remove_alpha',
     'image_cropping.thumbnail_processors.crop_corners',
     'easy_thumbnails.processors.colorspace',
     'easy_thumbnails.processors.autocrop',
@@ -84,6 +85,8 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'core.urls'
+DATA_UPLOAD_MAX_NUMBER_FIELDS = 10000
+
 
 TEMPLATES = [
     {

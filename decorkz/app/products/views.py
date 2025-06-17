@@ -255,6 +255,15 @@ def catalog(request, category_slug=None):
     }
     return render(request, "catalog.html", context)
 
+def build_size_string(sizes: dict) -> str:
+    parts = []
+    for key in ['height', 'width', 'length']:
+        value = sizes.get(key)
+        if value not in (None, '', 'None'):
+            parts.append(str(value))
+    if parts:
+        return ' × '.join(parts) + ' мм'
+    return ""
 
 
 def product_detail(request, slug):
@@ -271,6 +280,7 @@ def product_detail(request, slug):
         'width': format_number(attrs_map.get('ширина')),
         'length': format_number(attrs_map.get('длина')),
     }
+    size_string = build_size_string(sizes)  # ← вызываем функцию
     vid = attrs_map.get('вид')
     podsvetka = attrs_map.get('подсветка')
 
@@ -310,6 +320,7 @@ def product_detail(request, slug):
         "og_description": seo_description,
         "og_image": og_image,  # ← вот оно!
         "sizes": sizes,
+        "size_string": size_string,  # ← кладём строку в контекст
         "vid": vid,
         "podsvetka": podsvetka,
         "other_attributes": other_attributes,

@@ -28,7 +28,7 @@ FILTER_CONFIG = {
         ],
         "attributes": ["вид", "подсветка"]
     },
-    "reiki": {
+    "rayki": {
         "price": [
             {"label": "Все", "value": ""},
             {"label": "До 3000₸", "value": "0-3000"},

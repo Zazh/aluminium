@@ -70,14 +70,6 @@
           </button>
         </div>
       </div>
-<!--      <div class="flex flex-row items-center gap-2">-->
-<!--        <label for="ordering" class="select-container">-->
-<!--          <select class="select" name="ordering" id="ordering">-->
-<!--            <option>По названию</option>-->
-<!--          </select>-->
-<!--          <svg width="16px" class="mr-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" data-slot="icon"><path fill-rule="evenodd" d="M5.22 10.22a.75.75 0 0 1 1.06 0L8 11.94l1.72-1.72a.75.75 0 1 1 1.06 1.06l-2.25 2.25a.75.75 0 0 1-1.06 0l-2.25-2.25a.75.75 0 0 1 0-1.06ZM10.78 5.78a.75.75 0 0 1-1.06 0L8 4.06 6.28 5.78a.75.75 0 0 1-1.06-1.06l2.25-2.25a.75.75 0 0 1 1.06 0l2.25 2.25a.75.75 0 0 1 0 1.06Z" clip-rule="evenodd"></path></svg>-->
-<!--        </label>-->
-<!--      </div>-->
     </div>
   </div>
 
@@ -85,16 +77,21 @@
   <article class="md:col-span-4 lg:col-span-3 col-span-full">
     <a href="{% url 'product-detail' slug=p.slug %}" role="link">
       <figure>
-        <img src="{{ p.image }}" loading="lazy" alt="{{ p.alt }}" title="{{ p.title_attr }}">
+        {% if p.image %}
+          <img src="{{ p.image }}" class="[ product-image ] object-cover w-full aspect-square" loading="lazy" alt="{{ p.alt }}" title="{{ p.title_attr }}">
+        {% else %}
+          <div class="flex items-center justify-center bg-gray-100 text-gray-400 aspect-square w-full h-auto [ product-image ]" style="min-height:120px;">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="#000000" width="60px" height="60px" viewBox="0 0 32 32" id="icon"><defs><style>.cls-1{fill:none;}</style></defs><title>no-image</title><path d="M30,3.4141,28.5859,2,2,28.5859,3.4141,30l2-2H26a2.0027,2.0027,0,0,0,2-2V5.4141ZM26,26H7.4141l7.7929-7.793,2.3788,2.3787a2,2,0,0,0,2.8284,0L22,19l4,3.9973Zm0-5.8318-2.5858-2.5859a2,2,0,0,0-2.8284,0L19,19.1682l-2.377-2.3771L26,7.4141Z"/><path d="M6,22V19l5-4.9966,1.3733,1.3733,1.4159-1.416-1.375-1.375a2,2,0,0,0-2.8284,0L6,16.1716V6H22V4H6A2.002,2.002,0,0,0,4,6V22Z"/><rect id="_Transparent_Rectangle_" data-name="&lt;Transparent Rectangle&gt;" class="cls-1" width="32" height="32"/></svg>
+          </div>
+        {% endif %}
         <figcaption class="py-3 flex gap-1 flex-col">
           <div class="flex items-center justify-between">
             <h2 class="[ flex flex-col gap-1 ]">
-              <span class="text-md uppercase font-bold">{{p.title}}</span>
+              <span class="text-md uppercase font-bold [ title-product ]">{{p.title}}</span>
             </h2>
-            <p class="font-medium text-md text-gray-500"><span class="price">{{ p.price }}</span> ₸</p>
           </div>
           <p class="text-sm text-gray-500 font-medium flex gap-2 ]">
-            <span>{{ p.category_title}}</span>
+            <span><span class="price">{{ p.price }}</span> ₸</span>
           </p>
         </figcaption>
       </figure>
@@ -106,7 +103,7 @@
   <div class="border-t-[1px] flex justify-between flex-wrap gap-4 items-center py-4 border-gray-300 col-span-full">
   {% if page_obj.paginator.num_pages > 1 %}
     <div>
-      <p class="text-sm text-gray-700">
+      <p class="text-sm ">
         Показано
         <span class="font-medium">{{ page_obj.start_index }}</span>
         по
@@ -119,9 +116,8 @@
   {% endif %}
 
 
-
     <div>
-      <nav class="isolate inline-flex -space-x-px rounded-md shadow-xs" aria-label="Pagination">
+      <nav class="isolate inline-flex -space-x-px rounded-md overflow-hidden shadow-xs" aria-label="Pagination">
         {% if page_obj.has_previous %}
         <a href="?page={{ page_obj.previous_page_number }}" class="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-gray-300 ring-inset hover:bg-gray-50 focus:z-20 focus:outline-offset-0">
           <span class="sr-only">Previous</span>
@@ -133,9 +129,10 @@
 
         {% for i in page_obj.paginator.page_range %}
           {% if page_obj.number == i %}
-            <span class="bg-blue-500 text-white px-3 py-1 rounded">{{ i }}</span>
+                <span aria-current="page" class="relative z-10 inline-flex items-center bg-blue-600 px-4 py-2 text-sm font-semibold text-white focus:z-20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">{{ i }}</span>
           {% else %}
-            <a href="?page={{ i }}" class="px-3 py-1">{{ i }}</a>
+                <a href="?page={{ i }}" class="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-gray-300 ring-inset hover:bg-gray-50 focus:z-20 focus:outline-offset-0">{{ i }}</a>
+
           {% endif %}
         {% endfor %}
 
@@ -154,6 +151,17 @@
   <!-- END pagination -->
 
   {% include "components/filter_modal.html" %}
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      document.querySelectorAll('.title-product').forEach(function (el) {
+          let text = el.textContent.trim();
+          if (text.length > 30) {
+              el.textContent = text.slice(0, 30) + '...';
+          }
+      });
+    });
+  </script>
 
 </section>
 {% endblock %}

@@ -3,6 +3,7 @@ from django.utils.safestring import mark_safe
 from easy_thumbnails.files import get_thumbnailer
 from image_cropping import ImageRatioField
 from django.core.exceptions import ValidationError
+from django.templatetags.static import static
 
 from decimal import Decimal, InvalidOperation
 import random
@@ -14,13 +15,11 @@ from core.utils import slug, unique_slug, product_image_upload_path, category_im
 # ---- CATEGORY -----------------------------------------------------------
 class ProductCategory(models.Model):
     title  = models.CharField("Название категории", max_length=100)
-    parent = models.ForeignKey("self", null=True, blank=True,
-                               related_name="children", on_delete=models.CASCADE)
+    parent = models.ForeignKey("self", null=True, blank=True, related_name="children", on_delete=models.CASCADE)
     slug   = models.SlugField(unique=True, blank=True)
 
     # ───── NEW ─────
-    image    = models.ImageField("Изображение", blank=True,
-                                 upload_to=category_image_upload_path)
+    image    = models.ImageField("Изображение", blank=True, upload_to=category_image_upload_path)
     cropping = ImageRatioField("image", "600x600", allow_fullsize=True)
 
     class Meta:
@@ -104,7 +103,7 @@ class Product(models.Model):
         old_slug = self.slug
         if not self.slug:
             self.slug = unique_slug(self, self.title, model=Product)
-            
+
         # Генерация SKU если он не задан
         if not self.sku:
             while True:
@@ -114,7 +113,7 @@ class Product(models.Model):
                 if not Product.objects.filter(sku=random_sku).exists():
                     self.sku = random_sku
                     break
-                
+
         super().save(*args, **kwargs)
 
         # переименование картинок при смене slug
@@ -127,8 +126,7 @@ class Product(models.Model):
 
 # ---- PRODUCT IMAGE ------------------------------------------------------
 class ProductImage(models.Model):
-    product = models.ForeignKey(Product, related_name="images",
-                                on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, related_name="images", on_delete=models.CASCADE)
     image = models.ImageField(upload_to=product_image_upload_path)
     cropping = ImageRatioField("image", "600x600", allow_fullsize=True)
     is_main = models.BooleanField("Главное", default=False)
@@ -142,6 +140,14 @@ class ProductImage(models.Model):
     # ---------- служебные -------------------------------------------------
     def thumb(self, alias="default"):
         return get_thumbnailer(self.image)[alias].url
+
+    @property
+    def default_url(self):
+        return self.thumb("default")
+
+    @property
+    def preview_url(self):
+        return self.thumb("preview")
 
     def rename_file(self, new_product_slug: str):
         if not self.image:
@@ -165,14 +171,10 @@ class ProductImage(models.Model):
     thumbnail_preview.short_description = "Превью"
 
     def save(self, *args, **kwargs):
-        # 1. сохраняем сам файл / модель
         super().save(*args, **kwargs)
-
-        # 2. если координаты уже заданы – прогреваем алиасы
-        if self.cropping:
+        if self.image and self.cropping:
             thumb = get_thumbnailer(self.image)
-            thumb['default']  # 600×600, crop = self.cropping
-            thumb['preview']  # 320×320, crop = False
+            thumb.get_thumbnail({'size': (550, 550), 'crop': True})
 
     def __str__(self):
         return f"{self.product} | {self.pk}"
