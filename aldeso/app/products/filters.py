@@ -13,20 +13,20 @@ from .models import (
 
 # ────────────────────────────────────────────────────────────────
 # Получаем slug-и основных атрибутов только один раз
-def _slug(attr_name: str) -> str | None:
-    try:
-        return Attribute.objects.only("slug").get(
-            name__iexact=attr_name
-        ).slug
-    except Attribute.DoesNotExist:
-        return None
-
-
-ATTR_SLUGS = {
-    "length":  _slug("длина"),
-    "width":   _slug("ширина"),
-    "height":  _slug("высота"),
-}
+# def _slug(attr_name: str) -> str | None:
+#     try:
+#         return Attribute.objects.only("slug").get(
+#             name__iexact=attr_name
+#         ).slug
+#     except Attribute.DoesNotExist:
+#         return None
+#
+#
+# ATTR_SLUGS = {
+#     "length":  _slug("длина"),
+#     "width":   _slug("ширина"),
+#     "height":  _slug("высота"),
+# }
 # ────────────────────────────────────────────────────────────────
 
 
