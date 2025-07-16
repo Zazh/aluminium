@@ -14,7 +14,7 @@
     <!-- Актуальный favicon для современных браузеров -->
     <link rel="icon" href="{% static 'favicon.ico' %}" type="image/x-icon">
 
-    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link href="{% static 'dist/styles.css' %}" rel="stylesheet">
 
@@ -104,7 +104,16 @@
 </script>
 <!-- END Modal open -->
 
-<script type="module" defer src="{% static 'dist/js/core/alpine-init.js' %}?v={{ now|date:'U' }}"></script>
+    <!-- --- ALPINE JS БЛОК --- -->
+    <script src="{% static 'dist/js/core/api.js' %}"></script>
+    <script src="{% static 'dist/js/components/catalog.js' %}"></script>
+    <script src="{% static 'dist/js/components/product.js' %}"></script>
+    <script src="{% static 'dist/js/components/sidebar.js' %}"></script>
+    <script src="{% static 'dist/js/components/homeCategories.js' %}"></script>
+    <script src="{% static 'dist/js/components/searchModal.js' %}"></script>
+    <script src="{% static 'dist/js/core/alpine-init.js' %}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <!-- --- END ALPINE JS БЛОК --- -->
 
 <!-- BEGIN price format -->
 <script>
