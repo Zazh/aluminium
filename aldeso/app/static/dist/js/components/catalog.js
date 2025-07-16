@@ -1,9 +1,6 @@
-/* static/js/components/catalog.js */
-import { apiGet } from '../core/api.js';
-
-export default function catalog () {
+function catalog() {
   return {
-    /* ───────── состояние ───────── */
+    // ───────── состояние ─────────
     products:   [],
     categories: [],
     loading:    true,
@@ -12,10 +9,10 @@ export default function catalog () {
     perPage:    20,
     totalPages: 1,
 
-    /* H1-заголовок страницы */
+    // H1-заголовок страницы
     currentTitle: 'Каталог товаров',
 
-    /* выбранные фильтры (меняются из filterModal) */
+    // выбранные фильтры (меняются из filterModal)
     filters: {
       price:    null,          // '0-10000', '10000-49999', … | null
       length:   null,          // см. buildParams()
@@ -24,8 +21,8 @@ export default function catalog () {
       ordering: '-price',      // '', 'title', '-title', 'price', '-price'
     },
 
-    /* ───────── computed ───────── */
-    get slug () {       // '' | 'plintusy' | …
+    // ───────── computed ─────────
+    get slug () {
       return window.location.pathname
                    .split('/')
                    .filter(Boolean)
@@ -39,11 +36,11 @@ export default function catalog () {
       return a ? a.value : null;
     },
 
-    /* ───────── lifecycle ───────── */
+    // ───────── lifecycle ─────────
     async init () {
-      /* 1. категории (нужны для заголовка) */
+      // 1. категории (нужны для заголовка)
       try {
-        const catResp   = await apiGet('/api/categories/');
+        const catResp   = await window.apiGet('/api/categories/');
         this.categories = Array.isArray(catResp)
                         ? catResp
                         : catResp.results ?? [];
@@ -51,47 +48,46 @@ export default function catalog () {
         const cat = this.categories.find(c => c.slug === this.slug);
         if (cat) {
           this.currentTitle = cat.title;
-          // document.title    = cat.title;
         }
       } catch (e) { console.error('Не удалось загрузить категории', e); }
 
-      /* 2. товары */
+      // 2. товары
       await this.fetchProducts();
     },
 
-    /* ───────── helpers ───────── */
+    // ───────── helpers ─────────
     /** формируем query-параметры с учётом фильтров */
-buildParams () {
-  const p = { page: this.page };
-  if (this.slug) p['category__slug'] = this.slug;
+    buildParams () {
+      const p = { page: this.page };
+      if (this.slug) p['category__slug'] = this.slug;
 
-  /* ─ Цена ─ */
-  if (this.filters.price) {
-    const [min,max] = this.filters.price.split('-');
-    if (min) p['price_min'] = min;
-    if (max) p['price_max'] = max;
-  }
+      // ─ Цена ─
+      if (this.filters.price) {
+        const [min, max] = this.filters.price.split('-');
+        if (min) p['price_min'] = min;
+        if (max) p['price_max'] = max;
+      }
 
-  /* ─ Габариты ─ */
-  const map = { length:'length', width:'width', height:'height' };
-  for (const k in map) {
-    if (!this.filters[k]) continue;
-    const [min,max] = this.filters[k].split('-');
-    if (min) p[`${map[k]}_min`] = min;
-    if (max) p[`${map[k]}_max`] = max;
-  }
+      // ─ Габариты ─
+      const map = { length:'length', width:'width', height:'height' };
+      for (const k in map) {
+        if (!this.filters[k]) continue;
+        const [min, max] = this.filters[k].split('-');
+        if (min) p[`${map[k]}_min`] = min;
+        if (max) p[`${map[k]}_max`] = max;
+      }
 
-  /* ─ Сортировка ─ */
-  if (this.filters.ordering) p.ordering = this.filters.ordering;
+      // ─ Сортировка ─
+      if (this.filters.ordering) p.ordering = this.filters.ordering;
 
-  return p;
-},
+      return p;
+    },
 
     /** загрузка товаров */
     async fetchProducts () {
       this.loading = true;
       try {
-        const data = await apiGet('/api/products/', this.buildParams());
+        const data = await window.apiGet('/api/products/', this.buildParams());
         this.products   = data.results ?? data;          // DRF-pagination
         this.totalPages = data.count
                         ? Math.ceil(data.count / this.perPage)
@@ -99,7 +95,7 @@ buildParams () {
       } finally { this.loading = false; }
     },
 
-    /* ───────── внешний API ───────── */
+    // ───────── внешний API ─────────
     /** вызывается из модалки при «Применить» */
     async applyFilters (obj) {
       this.page    = 1;
@@ -107,12 +103,12 @@ buildParams () {
       await this.fetchProducts();
     },
 
-    /* ───────── раскладка 3-колонки ───────── */
-    col (n) {              // 0,1,2
+    // ───────── раскладка 3-колонки ─────────
+    col (n) { // 0,1,2
       return this.products.filter((_, i) => i % 3 === n);
     },
 
-    /* ───────── пагинация ───────── */
+    // ───────── пагинация ─────────
     nextPage () {
       if (this.page < this.totalPages) {
         this.page++;
@@ -129,3 +125,6 @@ buildParams () {
     },
   };
 }
+
+// Делаем функцию глобальной для Alpine
+window.catalog = catalog;

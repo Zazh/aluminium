@@ -1,6 +1,4 @@
-import { apiGet } from '../core/api.js';
-
-export default function sidebar() {
+function sidebar() {
   return {
     categories: [],
     mainCategories: [],
@@ -12,7 +10,7 @@ export default function sidebar() {
 
     async init() {
       try {
-        const data = await apiGet('/api/categories/');
+        const data = await window.apiGet('/api/categories/');
         const list = Array.isArray(data) ? data : data.results ?? [];
 
         // Главные (root) категории
@@ -35,3 +33,6 @@ export default function sidebar() {
     },
   };
 }
+
+// Делаем функцию глобальной для Alpine
+window.sidebar = sidebar;

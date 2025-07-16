@@ -1,12 +1,10 @@
-import { apiGet } from '../core/api.js';
-
-export default function homeCategories() {
+function homeCategories() {
   return {
     categories: [],
     loading: true,
 
     async init() {
-      const raw = await apiGet('/api/categories/');
+      const raw = await window.apiGet('/api/categories/');
       const all = Array.isArray(raw) ? raw : raw.results ?? [];
       // Оставляем только главные (root) категории
       this.categories = all.filter(cat => cat.parent_id === null);
@@ -18,3 +16,6 @@ export default function homeCategories() {
     },
   };
 }
+
+// Делаем функцию глобальной для Alpine
+window.homeCategories = homeCategories;

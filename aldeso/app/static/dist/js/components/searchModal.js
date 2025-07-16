@@ -1,11 +1,13 @@
-/* static/js/components/searchModal.js */
-import { apiGet } from '../core/api.js';
+// static/js/components/searchModal.js
+
+// Нет import!
+// Все функции и переменные внутри файла
 
 const LS_KEY      = 'search-history';
 const MAX_HISTORY = 6;
 const DEBOUNCE_MS = 400;
 
-export default function searchModal () {
+window.searchModal = function () {
   return {
     /* ─── состояние ─── */
     q:        '',
@@ -37,7 +39,7 @@ export default function searchModal () {
 
       this.state = this.history.length ? 'history' : 'empty';
 
-      /* фокус после реального появления окна */
+      // фокус после появления окна
       requestAnimationFrame(() => this.$refs.searchInput?.focus());
     },
 
@@ -47,7 +49,7 @@ export default function searchModal () {
 
       const txt = this.q.trim();
 
-      /* короче 3-х → чистим результаты и возвращаем history/empty */
+      // если короче 3-х → чистим результаты и возвращаем history/empty
       if (txt.length < 3) {
         this.results = [];
         this.state   = this.history.length ? 'history' : 'empty';
@@ -64,7 +66,7 @@ export default function searchModal () {
 
       this.loading = true;
       try {
-        const data = await apiGet('/api/products/', {
+        const data = await window.apiGet('/api/products/', {
           search:    query,
           page_size: 8
         });
@@ -95,4 +97,4 @@ export default function searchModal () {
       this.state = 'empty';
     }
   };
-}
+};
