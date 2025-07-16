@@ -77,6 +77,16 @@ document.querySelectorAll('.price').forEach(el => {
 });
 </script>
 
-    <script type="module" defer src="{% static 'dist/js/core/alpine-init.js' %}?v={{ now|date:'U' }}"></script>
+<!-- --- ALPINE JS БЛОК --- -->
+<script src="{% static 'dist/js/core/api.js' %}"></script>
+<script src="{% static 'dist/js/components/catalog.js' %}"></script>
+<script src="{% static 'dist/js/components/product.js' %}"></script>
+<script src="{% static 'dist/js/components/sidebar.js' %}"></script>
+<script src="{% static 'dist/js/components/homeCategories.js' %}"></script>
+<script src="{% static 'dist/js/components/searchModal.js' %}"></script>
+<script src="{% static 'dist/js/core/alpine-init.js' %}"></script>
+<script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+<!-- --- END ALPINE JS БЛОК --- -->
+
 </body>
 </html>
